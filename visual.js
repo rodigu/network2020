@@ -1,19 +1,29 @@
 class VisualNetwork{
   constructor(){
+    this.network = new Network();
 
+  }
+  checkOverlaps(){
+
+  }
+  checkMouse(){
+     // check if mouse is pressed and overlaping each node
   }
 }
 
 // Note: only go through the connections and draw them
-
+var classNetwork = new VisualNetwork();
 function setup(){
   createCanvas(windowWidth, windowHeight);
   background(120, 50, 100);
 }
-function windowResized(){
 
+function windowResized(){
+  resizeCanvas(windowWidth, windowHeight);
 }
+
 function draw(){
-  fill(100);
+  fill(200);
   rect(mouseX, mouseY, 10, 10);
+  if (//mouseIsPressed) classNetwork.checkMouse();
 }
