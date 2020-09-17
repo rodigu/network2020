@@ -34,9 +34,9 @@ class VisualNetwork{
   }
   display(){
     let counter;
+    strokeWeight(sizes/5);
+    stroke(220, 50);
     for (counter = 0; counter < this.network.connections.length; counter++){
-      strokeWeight(3);
-      stroke(220, 50);
       let nodeA = this.network.getNode(this.network.connections[counter].nodes[0]);
       let nodeB = this.network.getNode(this.network.connections[counter].nodes[1]);
       line(nodeA.x, nodeA.y, nodeB.x, nodeB.y);
@@ -44,28 +44,31 @@ class VisualNetwork{
       let rotation;
       translate((nodeA.x + nodeB.x)/2, (nodeA.y + nodeB.y)/2);
       noStroke();
+      let triSize = sizes/5;
       if (this.network.connections[counter].direction == 1){
         fill(200, 100, 100);
         rotation = -atan2(nodeA.x - (nodeA.x + nodeB.x)/2, nodeA.y - (nodeA.y + nodeB.y)/2);
         rotate(rotation);
-        triangle(0, -5, 5, 5, -5, 5);
+        triangle(0, -triSize, triSize, triSize, -triSize, triSize);
       }
       if (this.network.connections[counter].direction == 2){
         fill(100, 100, 200);
         rotation = -atan2(nodeB.x - (nodeA.x + nodeB.x)/2, nodeB.y - (nodeA.y + nodeB.y)/2);
         rotate(rotation);
-        triangle(0, -5, 5, 5, -5, 5);
+        triangle(0, -triSize, triSize, triSize, -triSize, triSize);
       }
       pop();
-      strokeWeight(2);
-      stroke(0);
     }
     for (counter = 0; counter < this.network.nodes.length; counter++){
       fill(174, 207, 198);
-      circle(this.network.nodes[counter].x, this.network.nodes[counter].y, 20);
+      noStroke();
+      circle(this.network.nodes[counter].x, this.network.nodes[counter].y, sizes);
       push();
       fill(255);
       translate(this.network.nodes[counter].x, this.network.nodes[counter].y);
+      textAlign(CENTER, CENTER);
+      strokeWeight(2);
+      stroke(0);
       text(this.network.nodes[counter].name.join(""), 0, 0);
       pop();
     }
@@ -74,9 +77,10 @@ class VisualNetwork{
     let counter;
      // check if mouse is pressed and overlaping each node
      for (counter = 0; counter < this.network.nodes.length; counter++){
-       if ((mouseX - this.network.nodes[counter].x)**2 + (mouseY - this.network.nodes[counter].y)**2 < 100){
+       if ((mouseX - this.network.nodes[counter].x)**2 + (mouseY - this.network.nodes[counter].y)**2 < (sizes/2)**2){
          push();
          fill(255, 100, 100);
+         textAlign(CENTER, CENTER);
          translate(this.network.nodes[counter].x, this.network.nodes[counter].y);
          text(this.network.nodes[counter].name.join(""), 0, 0);
          pop();
@@ -92,6 +96,7 @@ class VisualNetwork{
      }
   }
 }
+var sizes = 40;
 var classSheet;
 var classNetwork;
 var mouseCheck;
@@ -125,6 +130,10 @@ function keyTyped() {
   else if (key === 'b')
     classNetwork.redoConnectionsB();
   return false;
+}
+function mouseWheel(event){
+  if (sizes > 1) sizes += event.delta;
+  else sizes = 2;
 }
 
 function draw(){
