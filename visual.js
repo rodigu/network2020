@@ -44,13 +44,14 @@ class VisualNetwork{
       let rotation;
       translate((nodeA.x + nodeB.x)/2, (nodeA.y + nodeB.y)/2);
       noStroke();
-      fill(200, 100, 100);
       if (this.network.connections[counter].direction == 1){
+        fill(200, 100, 100);
         rotation = -atan2(nodeA.x - (nodeA.x + nodeB.x)/2, nodeA.y - (nodeA.y + nodeB.y)/2);
         rotate(rotation);
         triangle(0, -5, 5, 5, -5, 5);
       }
       if (this.network.connections[counter].direction == 2){
+        fill(100, 100, 200);
         rotation = -atan2(nodeB.x - (nodeA.x + nodeB.x)/2, nodeB.y - (nodeA.y + nodeB.y)/2);
         rotate(rotation);
         triangle(0, -5, 5, 5, -5, 5);
@@ -60,7 +61,7 @@ class VisualNetwork{
       stroke(0);
     }
     for (counter = 0; counter < this.network.nodes.length; counter++){
-      fill(174, 198, 207);
+      fill(174, 207, 198);
       circle(this.network.nodes[counter].x, this.network.nodes[counter].y, 20);
       push();
       fill(255);
