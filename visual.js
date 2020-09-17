@@ -8,9 +8,8 @@ class VisualNetwork{
       let counter2;
       let tempMatrix = [];
       for (counter2 = 0; counter2 < classSheet_[counter].length; counter2++){
-        if (classSheet[counter][counter2] != ','){
+        if (classSheet[counter][counter2] != ',')
           tempMatrix.push(classSheet[counter][counter2]);
-        }
         else if (classSheet[counter][counter2] == ','){
           this.classMatrix.push(tempMatrix);
           tempMatrix = [];
@@ -22,9 +21,8 @@ class VisualNetwork{
       let counter2;
       for (counter2 = 1; counter2 < 19; counter2++){
         // this makes it so we are only taking in values below the diagonal
-        if (counter2 < counter && this.classMatrix[19*counter + counter2] == "1"){
+        if (counter2 < counter && this.classMatrix[19*counter + counter2] == "1")
           this.network.createConnection((counter2 - 1)%19, (counter - 1)%19);
-        }
       }
     }
     for (counter = 0; counter < classSheet_.length -  2; counter++){
@@ -124,6 +122,7 @@ function mousePressed(){
 }
 function mouseReleased(){
   mouseCheck = false;
+  console.log(classNetwork.classMatrix.length);
 }
 
 function keyPressed(){
