@@ -3,22 +3,22 @@ class Network{
     this.nodes = [];
     this.connections = [];
   }
-  createNode(id_, value_, name_, x_ = 0, y_ = 0){
-    this.nodes.push(new Node(id_, value_, name_, x_, y_));
+  createNode(id_, name_, value_ = 0, x_ = 0, y_ = 0){
+    this.nodes.push(new Node(id_, name_, value_, x_, y_));
   }
-  createConnection(node1_, node2_, weight_, direction_){
+  createConnection(node1_, node2_, weight_ = 0, direction_ = 0){
     this.connections.push(new Connection(node1_, node2_, weight_, direction_));
   }
   // returns a node given an specific id
   getNode(nodeId_){
     let counter;
-    for (counter = 0; counter < nodes.length; counter++)
-      if (nodeId == nodes[counter].id) return nodes[counter];
+    for (counter = 0; counter < this.nodes.length; counter++)
+      if (nodeId_ == this.nodes[counter].id) return this.nodes[counter];
   }
 }
 
 class Node{
-  constructor(id_, value_, name_, x_ = 0, y_ = 0){
+  constructor(id_, name_, value_ = 0, x_ = 0, y_ = 0){
     this.id = id_;
     this.value = value_;
     this.name = name_;
@@ -30,7 +30,7 @@ class Node{
 class Connection{
   // takes 2 nodes' ids, a value, and a direction (0 = undirected,
   // 1 = directed towards node 1, 2 = directed towards node 2)
-  constructor(node1_, node2_, weight_, direction_){
+  constructor(node1_, node2_, weight_ = 0, direction_ = 0){
     this.nodes = [node1_, node2_];
     this.direction = direction_;
     this.weight = weight_;
