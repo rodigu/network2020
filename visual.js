@@ -15,7 +15,6 @@ class VisualNetwork{
           this.classMatrix.push(tempMatrix);
           tempMatrix = [];
         }
-
       }
     }
 
@@ -84,7 +83,7 @@ class VisualNetwork{
     let counter;
      // check if mouse is pressed and overlaping each node
      for (counter = 0; counter < this.network.nodes.length; counter++){
-       if ((mouseX - this.network.nodes[counter].x)**2 + (mouseY - this.network.nodes[counter].y)**2 < 200){
+       if ((mouseX - this.network.nodes[counter].x)**2 + (mouseY - this.network.nodes[counter].y)**2 < 100){
          push();
          fill(255, 100, 100);
          translate(this.network.nodes[counter].x, this.network.nodes[counter].y);
@@ -134,12 +133,13 @@ function keyPressed(){
     classNetwork.redoConnectionsB();
 }
 function keyTyped() {
+  // lower diagonal
   if (key === 'a')
     classNetwork.redoConnectionsA();
+  // upper diagonal
   else if (key === 'b')
     classNetwork.redoConnectionsB();
-  // uncomment to prevent any default behavior
-  // return false;
+  return false;
 }
 
 function draw(){
@@ -148,6 +148,5 @@ function draw(){
   classNetwork.display();
   classNetwork.checkMouse();
 
-  console.log(key);
   // if (mouseIsPressed) classNetwork.checkMouse();
 }
