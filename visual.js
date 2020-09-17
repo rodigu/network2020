@@ -16,13 +16,15 @@ class VisualNetwork{
         }
       }
     }
-
-    for (counter = 1; counter < 19; counter++){
+    this.items = int(this.classMatrix.length/19);
+    for (counter = 1; counter < this.items; counter++){
       let counter2;
-      for (counter2 = 1; counter2 < 19; counter2++){
+      for (counter2 = 1; counter2 < this.items; counter2++){
         // this makes it so we are only taking in values below the diagonal
-        if (counter2 < counter && this.classMatrix[19*counter + counter2] == "1")
-          this.network.createConnection((counter2 - 1)%19, (counter - 1)%19);
+        if (counter2 < counter && this.classMatrix[this.items*counter + counter2] == "1")
+          this.network.createConnection((counter - 1)%this.items, (counter2 - 1)%this.items, 0, 1);
+        else if (counter2 > counter && this.classMatrix[this.items*counter + counter2] == "1")
+          this.network.createConnection((counter2 - 1)%this.items, (counter - 1)%this.items, 0, 2);
       }
     }
     for (counter = 0; counter < classSheet_.length -  2; counter++){
@@ -38,6 +40,22 @@ class VisualNetwork{
       let nodeA = this.network.getNode(this.network.connections[counter].nodes[0]);
       let nodeB = this.network.getNode(this.network.connections[counter].nodes[1]);
       line(nodeA.x, nodeA.y, nodeB.x, nodeB.y);
+      push();
+      let rotation;
+      translate((nodeA.x + nodeB.x)/2, (nodeA.y + nodeB.y)/2);
+      noStroke();
+      fill(200, 100, 100);
+      if (this.network.connections[counter].direction == 1){
+        rotation = -atan2(nodeA.x - (nodeA.x + nodeB.x)/2, nodeA.y - (nodeA.y + nodeB.y)/2);
+        rotate(rotation);
+        triangle(0, -5, 5, 5, -5, 5);
+      }
+      if (this.network.connections[counter].direction == 2){
+        rotation = -atan2(nodeB.x - (nodeA.x + nodeB.x)/2, nodeB.y - (nodeA.y + nodeB.y)/2);
+        rotate(rotation);
+        triangle(0, -5, 5, 5, -5, 5);
+      }
+      pop();
       strokeWeight(2);
       stroke(0);
     }
@@ -49,32 +67,6 @@ class VisualNetwork{
       translate(this.network.nodes[counter].x, this.network.nodes[counter].y);
       text(this.network.nodes[counter].name.join(""), 0, 0);
       pop();
-    }
-  }
-  redoConnectionsA(){
-    this.network.connections = [];
-    let counter;
-    for (counter = 1; counter < 19; counter++){
-      let counter2;
-      for (counter2 = 1; counter2 < 19; counter2++){
-        // this makes it so we are only taking in values below the diagonal
-        if (counter2 < counter && this.classMatrix[19*counter + counter2] == "1"){
-          this.network.createConnection((counter2 - 1)%19, (counter - 1)%19);
-        }
-      }
-    }
-  }
-  redoConnectionsB(){
-    this.network.connections = [];
-    let counter;
-    for (counter = 1; counter < 19; counter++){
-      let counter2;
-      for (counter2 = 1; counter2 < 19; counter2++){
-        // this makes it so we are only taking in values below the diagonal
-        if (counter2 > counter && this.classMatrix[19*counter + counter2] == "1"){
-          this.network.createConnection((counter2 - 1)%19, (counter - 1)%19);
-        }
-      }
     }
   }
   checkMouse(){
@@ -122,15 +114,8 @@ function mousePressed(){
 }
 function mouseReleased(){
   mouseCheck = false;
-  console.log(classNetwork.classMatrix.length);
 }
 
-function keyPressed(){
-  if (key == 'a')
-    classNetwork.redoConnectionsA();
-  else if (key == 'b');
-    classNetwork.redoConnectionsB();
-}
 function keyTyped() {
   // lower diagonal
   if (key === 'a')
