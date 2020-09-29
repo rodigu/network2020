@@ -1,9 +1,21 @@
 class Network{
-  constructor(){
+  constructor(nodes_ = []){
     this.nodes = [];
     this.edges = [];
+    if (nodes_.length > 0){
+      let counter1, counter2;
+      for (counter1 = 0; counter1 < nodes_.length; counter1 ++)
+        for (counter2 = 0; counter2 < nodes_[counter1].length; counter2 ++)
+          if (counter2 > counter1)
+            if (nodes_[counter1][counter2] == nodes_[counter2][counter1] && nodes_[counter2][counter1] == 1)
+              this.addEdge(counter1, counter2, 1, 0);
+            else if(nodes_[counter1][counter2] > nodes_[counter2][counter1])
+              this.addEdge(counter1, counter2, 1, 1);
+            else if(nodes_[counter1][counter2] < nodes_[counter2][counter1])
+              this.addEdge(counter2, counter1, 1, 1);
+    }
   }
-  addNode(id_, name_ = '', weight_ = 0){
+  addNode(id_, name_ = '', weight_ = 1){
     this.nodes.push(new Node(id_, name_, weight_));
   }
   getNode(nodeId_){
@@ -33,7 +45,7 @@ class Network{
     for (counter = 0; counter < this.nodes.length; counter++)
       if(this.nodes[counter].id == id_) this.nodes[counter].y = y_;
   }
-  addEdge(node1_, node2_, weight_ = 0, direction_ = 0){
+  addEdge(node1_, node2_, weight_ = 1, direction_ = 0){
     this.edges.push(new Edge(node1_, node2_, weight_, direction_));
     // if the nodes don't exist, they are added without names or weights
     if (this.getNode(node1_) == null)
@@ -145,7 +157,7 @@ class Network{
 
 class Node{
   // x and y positions kept to facilitate visualizations
-  constructor(id_, name_ = '', weight_ = 0, x_ = 0, y_ = 0, color_ = []){
+  constructor(id_, name_ = '', weight_ = 1, x_ = 0, y_ = 0, color_ = []){
     this.id = id_;
     this.weight = weight_;
     this.name = name_;
@@ -157,17 +169,11 @@ class Node{
 
 class Edge{
   // takes 2 nodes' ids, a value, and a direction (0 = undirected,
-<<<<<<< HEAD
   // 1 = directed towards node 2)
-  constructor(node1_, node2_, weight_ = 0, direction_ = 0){
+  constructor(node1_, node2_, weight_ = 1, direction_ = 0){
     this.nodes = [node1_, node2_];
-=======
-  // 1 = directed towards node 0, 2 = directed towards node 1)
-  constructor(node0_, node1_, weight_ = 0, direction_ = 0){
-    this.nodes = [node0_, node1_];
->>>>>>> master
     this.direction = direction_;
     this.weight = weight_;
   }
 }
-module.exports = {Network}
+// module.exports = {Network}
