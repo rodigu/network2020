@@ -157,9 +157,15 @@ class Node{
 
 class Edge{
   // takes 2 nodes' ids, a value, and a direction (0 = undirected,
+<<<<<<< HEAD
   // 1 = directed towards node 2)
   constructor(node1_, node2_, weight_ = 0, direction_ = 0){
     this.nodes = [node1_, node2_];
+=======
+  // 1 = directed towards node 0, 2 = directed towards node 1)
+  constructor(node0_, node1_, weight_ = 0, direction_ = 0){
+    this.nodes = [node0_, node1_];
+>>>>>>> master
     this.direction = direction_;
     this.weight = weight_;
   }
