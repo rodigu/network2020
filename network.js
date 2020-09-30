@@ -16,6 +16,11 @@ class Network{
     }
   }
   addNode(id_, name_ = '', weight_ = 1){
+    let counter;
+    for (counter = 0; counter < this.nodes.length; counter++){
+      if(this.nodes[counter].id == id_)
+        return null;
+    }
     this.nodes.push(new Node(id_, name_, weight_));
   }
   getNode(nodeId_){
@@ -46,12 +51,15 @@ class Network{
       if(this.nodes[counter].id == id_) this.nodes[counter].y = y_;
   }
   addEdge(node1_, node2_, weight_ = 1, direction_ = 0){
-    this.edges.push(new Edge(node1_, node2_, weight_, direction_));
-    // if the nodes don't exist, they are added without names or weights
-    if (this.getNode(node1_) == null)
-      this.addNode(node1_);
-    if (this.getNode(node2_) == null)
-      this.addNode(node2_);
+    if (!this.undirectedEdge(node1_, node2_)){
+      this.edges.push(new Edge(node1_, node2_, weight_, direction_));
+      // if the nodes don't exist, they are added without names or weights
+      if (this.getNode(node1_) == null)
+        this.addNode(node1_);
+      if (this.getNode(node2_) == null)
+        this.addNode(node2_);
+    }
+    else console.log("Edge already exists");
   }
   addEdges(edges_){
     let counter;
@@ -76,15 +84,11 @@ class Network{
   // takes in 2 node IDs and checks if they have an edge connecting them
   undirectedEdge(node1_, node2_){
     let counter;
-    // console.log("AAA");
-    // console.log(this.edges.length);
     for (counter = 0; counter < this.edges.length; counter++){
       if ((this.edges[counter].nodes[0] == node1_ && this.edges[counter].nodes[1] == node2_) ||
           (this.edges[counter].nodes[0] == node2_ && this.edges[counter].nodes[1] == node1_)){
         return true;
       }
-      // console.log("BBB");
-      // console.log(this.edges[counter].nodes[0], this.edges[counter].nodes[0]);
     }
     return false;
   }
@@ -152,6 +156,16 @@ class Network{
   }
   density(){
     return this.edges.length/this.undirectedMaxEdges();
+  }
+  assortativity(id_){
+    let answer = 0;
+    let knn = 1/this.degree(id_);
+    let counter;
+    let id_neighbors = this.nodeNeighbors(id_);
+    console.log(">>", id_neighbors);
+    for (counter = 0; counter < id_neighbors.length; counter++)
+      answer += this.degree(id_neighbors[counter].id);
+    return answer*knn;
   }
 }
 

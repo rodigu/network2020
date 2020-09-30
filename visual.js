@@ -51,12 +51,12 @@ class Visualize{
         circle(this.network.nodes[counter].x, this.network.nodes[counter].y, (temp_size));
       }
       fill(0);
-      noStroke(0);
+      noStroke();
       textSize(20);
       push();
       translate(this.network.nodes[counter].x, this.network.nodes[counter].y);
       textAlign(CENTER, CENTER);
-      //text(this.network.nodes[counter].weight, 0, 0);
+      text(this.network.nodes[counter].id, 0, 0);
       pop();
     }
     fill(255);

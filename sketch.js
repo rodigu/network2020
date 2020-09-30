@@ -4,7 +4,7 @@ var NETUSE;
 function setup(){
   controller = new Control();
   NETUSE = 0;
-  var canvas = createCanvas(600, 400);
+  var canvas = createCanvas(windowWidth/2, windowHeight);
   var x = (windowWidth - width) / 2;
   var y = (windowHeight - height) / 2;
   canvas.position(x, y);
