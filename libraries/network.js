@@ -15,20 +15,6 @@ class Network{
               this.addEdge(counter2, counter1, 1, 1);
     }
   }
-  addNode(id_, name_ = '', weight_ = 1){
-    let counter;
-    for (counter = 0; counter < this.nodes.length; counter++){
-      if(this.nodes[counter].id == id_)
-        return null;
-    }
-    this.nodes.push(new Node(id_, name_, weight_));
-  }
-  getNode(nodeId_){
-    let counter;
-    for (counter = 0; counter < this.nodes.length; counter++)
-      if (nodeId_ == this.nodes[counter].id) return this.nodes[counter];
-    return null;
-  }
   setNodeColor(id_, color_){
     let counter
     for (counter = 0; counter < this.nodes.length; counter++)
@@ -50,22 +36,6 @@ class Network{
     for (counter = 0; counter < this.nodes.length; counter++)
       if(this.nodes[counter].id == id_) this.nodes[counter].y = y_;
   }
-  addEdge(node1_, node2_, weight_ = 1, direction_ = 0){
-    if (!this.undirectedEdge(node1_, node2_)){
-      this.edges.push(new Edge(node1_, node2_, weight_, direction_));
-      // if the nodes don't exist, they are added without names or weights
-      if (this.getNode(node1_) == null)
-        this.addNode(node1_);
-      if (this.getNode(node2_) == null)
-        this.addNode(node2_);
-    }
-    else console.log("Edge already exists");
-  }
-  addEdges(edges_){
-    let counter;
-    for(counter = 0; counter < edges_.length; counter++)
-      this.addEdge(edges_[counter][0], edges_[counter][1], 0, 1);
-  }
   addDirectedEdges(edges_){
     let counter;
     for(counter = 0; counter < edges_.length; counter++)
@@ -81,15 +51,12 @@ class Network{
   getGenus(){
     return this.edges.length - this.nodes.length + 1;
   }
-  // takes in 2 node IDs and checks if they have an edge connecting them
   undirectedEdge(node1_, node2_){
     let counter;
-    for (counter = 0; counter < this.edges.length; counter++){
+    for (counter = 0; counter < this.edges.length; counter++)
       if ((this.edges[counter].nodes[0] == node1_ && this.edges[counter].nodes[1] == node2_) ||
-          (this.edges[counter].nodes[0] == node2_ && this.edges[counter].nodes[1] == node1_)){
+          (this.edges[counter].nodes[0] == node2_ && this.edges[counter].nodes[1] == node1_))
         return true;
-      }
-    }
     return false;
   }
   directedEdge(node1_, node2_){
@@ -167,8 +134,59 @@ class Network{
       answer += this.degree(id_neighbors[counter].id);
     return answer*knn;
   }
+  complement(){
+    let temp_network = new Network();
+    let counter, counter1;
+    for (counter = 0; counter < this.nodes.length; counter++)
+      for (counter1 = 0; counter1 < this.nodes.length; counter1++)
+        if (this.nodes[counter].id != this.nodes[counter1].id && !this.undirectedEdge(this.nodes[counter].id, this.nodes[counter1].id))
+          temp_network.addEdge(this.nodes[counter].id, this.nodes[counter1].id);
+    return temp_network;
+  }
+  ego(id_){
+    let temp_network = new Network();
+    let counter;
+    for (counter = 0; counter < this.nodes.length; counter++)
+      if (this.undirectedEdge(id_, this.nodes[counter].id)) temp_network.addEdge(id_, this.nodes[counter].id);
+    return temp_network;
+  }
 }
 
+// Basic Network functions
+Network.prototype.addNode = function (id_, name_ = '', weight_ = 1){
+  let counter;
+  for (counter = 0; counter < this.nodes.length; counter++){
+    if(this.nodes[counter].id == id_)
+      return null;
+  }
+  this.nodes.push(new Node(id_, name_, weight_));
+}
+Network.prototype.getNode = function (nodeId_){
+  let counter;
+  for (counter = 0; counter < this.nodes.length; counter++)
+    if (nodeId_ == this.nodes[counter].id) return this.nodes[counter];
+  return null;
+}
+
+// Edge Functions
+Network.prototype.addEdge = function (node1_, node2_, weight_ = 1, direction_ = 0){
+  if (!this.undirectedEdge(node1_, node2_)){
+    this.edges.push(new Edge(node1_, node2_, weight_, direction_));
+    // if the nodes don't exist, they are added without names or weights
+    if (this.getNode(node1_) == null)
+      this.addNode(node1_);
+    if (this.getNode(node2_) == null)
+      this.addNode(node2_);
+  }
+  else console.log("Edge already exists");
+}
+Network.prototype.addEdges = function (edges_){
+  let counter;
+  for(counter = 0; counter < edges_.length; counter++)
+    this.addEdge(edges_[counter][0], edges_[counter][1], 0, 1);
+}
+
+// Node and Edges classes
 class Node{
   // x and y positions kept to facilitate visualizations
   constructor(id_, name_ = '', weight_ = 1, x_ = 0, y_ = 0, color_ = []){
@@ -180,7 +198,6 @@ class Node{
     this.color = color_;
   }
 }
-
 class Edge{
   // takes 2 nodes' ids, a value, and a direction (0 = undirected,
   // 1 = directed towards node 2)
@@ -190,4 +207,3 @@ class Edge{
     this.weight = weight_;
   }
 }
-// module.exports = {Network}
