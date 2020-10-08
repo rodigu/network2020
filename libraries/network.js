@@ -146,8 +146,15 @@ class Network{
   ego(id_){
     let temp_network = new Network();
     let counter;
-    for (counter = 0; counter < this.nodes.length; counter++)
-      if (this.undirectedEdge(id_, this.nodes[counter].id)) temp_network.addEdge(id_, this.nodes[counter].id);
+    for (counter = 0; counter < this.nodes.length; counter++){
+      if (this.undirectedEdge(id_, this.nodes[counter].id)){
+        temp_network.addEdge(id_, this.nodes[counter].id);
+        let counter2;
+        let neighbors = this.nodeNeighbors(this.nodes[counter].id);
+        for (counter2 = 0; counter2 < neighbors.length; counter2++)
+          if (this.undirectedEdge(neighbors[counter2].id, this.nodes[counter].id) && this.undirectedEdge(id_, neighbors[counter2].id)) temp_network.addEdge(neighbors[counter2].id, this.nodes[counter].id);
+      }
+    }
     return temp_network;
   }
 }
@@ -170,7 +177,7 @@ Network.prototype.getNode = function (nodeId_){
 
 // Edge Functions
 Network.prototype.addEdge = function (node1_, node2_, weight_ = 1, direction_ = 0){
-  if (!this.undirectedEdge(node1_, node2_)){
+  if (!this.undirectedEdge(node1_, node2_) && node1_ != node2_){
     this.edges.push(new Edge(node1_, node2_, weight_, direction_));
     // if the nodes don't exist, they are added without names or weights
     if (this.getNode(node1_) == null)
@@ -185,6 +192,7 @@ Network.prototype.addEdges = function (edges_){
   for(counter = 0; counter < edges_.length; counter++)
     this.addEdge(edges_[counter][0], edges_[counter][1], 0, 1);
 }
+
 
 // Node and Edges classes
 class Node{
