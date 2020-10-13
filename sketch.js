@@ -1,9 +1,11 @@
 var controller;
 var NETUSE;
+var TYPE;
 
 function setup(){
   controller = new Control();
   NETUSE = 0;
+  TYPE = 'NONE';
   var canvas = createCanvas(windowWidth/2, 4*windowHeight/5);
   var x = (windowWidth - width) / 2;
   var y = (windowHeight - height) / 2;
@@ -12,13 +14,14 @@ function setup(){
   noStroke();
 }
 
-function draw(network_ = 0){
+function draw(network_ = 0, type_ = 'NONE'){
   if (network_ != 0) NETUSE = network_;
+  if (type_ != 'NONE') TYPE = type_;
   controller.mouseController();
   if (NETUSE === 0);
   else {
     background(0);
     let visual = new Visualize(NETUSE);
-    visual.drawNetwork(controller.mouse);
+    visual.drawNetwork(controller.mouse, TYPE);
   }
 }

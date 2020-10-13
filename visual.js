@@ -1,9 +1,9 @@
 class Visualize{
   constructor(network_){
     this.network = network_;
-    this.size = 0;
+    this.size = 20;
   }
-  drawNetwork(mouseCommand = [0, 0]){
+  drawNetwork(mouseCommand = [0, 0], type_ = 'NONE'){
     let counter;
     if (this.network.nodes.length < 1)
       return;
@@ -29,7 +29,7 @@ class Visualize{
           this.network.nodes[counter].x = mouseX;
           this.network.nodes[counter].y = mouseY;
       }
-      let temp_size = this.size + this.network.nodes[counter].weight*50;
+      let temp_size = this.size + this.network.nodes[counter].weight*5;
       fill(255);
       strokeWeight(1);
       stroke(1);
@@ -56,7 +56,11 @@ class Visualize{
       push();
       translate(this.network.nodes[counter].x, this.network.nodes[counter].y);
       textAlign(CENTER, CENTER);
-      text(this.network.nodes[counter].id, 0, 0);
+      let print_text;
+      if (type_ == 'weight') print_text = this.network.nodes[counter].weight;
+      else if (type_ == 'id') print_text = this.network.nodes[counter].id;
+      else print_text = '';
+      text(print_text, 0, 0);
       pop();
     }
     fill(255);

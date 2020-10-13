@@ -1,3 +1,4 @@
+// Crt + Shift + [ collapses
 class Network{
   constructor(nodes_ = []){
     this.nodes = [];
@@ -16,25 +17,30 @@ class Network{
     }
   }
   setNodeColor(id_, color_){
-    let counter
+    let counter;
     for (counter = 0; counter < this.nodes.length; counter++)
       if(this.nodes[counter].id == id_) this.nodes[counter].color = color_;
       // will add optimization later (add break)
   }
   setNodeX(id_, x_){
-    let counter
+    let counter;
     for (counter = 0; counter < this.nodes.length; counter++)
       if(this.nodes[counter].id == id_) this.nodes[counter].x = x_;
   }
   setNodeColor(id_, color_){
-    let counter
+    let counter;
     for (counter = 0; counter < this.nodes.length; counter++)
       if(this.nodes[counter].id == id_) this.nodes[counter].color = color_;
   }
   setNodeY(id_, y_){
-    let counter
+    let counter;
     for (counter = 0; counter < this.nodes.length; counter++)
       if(this.nodes[counter].id == id_) this.nodes[counter].y = y_;
+  }
+  setNodeWeight(id_, weight_){
+    let counter;
+    for (counter = 0; counter < this.nodes.length; counter++)
+      if(this.nodes[counter].id == id_) this.nodes[counter].weight = weight_;
   }
   addDirectedEdges(edges_){
     let counter;
@@ -47,6 +53,14 @@ class Network{
     for (counter = 0; counter < this.nodes.length; counter ++)
       answer += this.nodes[counter].weight;
     return answer;
+  }
+  getEdgeWeight(node1_, node2_){
+    let counter;
+    for (counter = 0; counter < this.edges.length; counter++)
+      if ((this.edges[counter].nodes[0] == node1_ && this.edges[counter].nodes[1] == node2_) ||
+          (this.edges[counter].nodes[0] == node2_ && this.edges[counter].nodes[1] == node1_))
+        return this.edges[counter].weight;
+    return -1;
   }
   getGenus(){
     return this.edges.length - this.nodes.length + 1;
@@ -82,6 +96,7 @@ class Network{
     return answer;
   }
   nodeNeighbors(id_){
+    // Returns a list of nodes neighbors to id_
     let answer = [];
     let counter;
     for (counter = 0; counter < this.nodes.length; counter++)
@@ -156,6 +171,81 @@ class Network{
       }
     }
     return temp_network;
+  }
+  duplicate(){
+    let counter;
+    let dup = new Network();
+    for (counter = 0; counter < this.nodes.length; counter++)
+      dup.addNode(this.nodes[counter].id, this.nodes[counter].name, this.nodes[counter].weight);
+    for (counter = 0; counter < this.edges.length; counter++)
+      dup.addEdge(this.edges[counter].nodes[0], this.edges[counter].nodes[1], this.edges[counter].weight, this.edges[counter].direction);
+    return dup;
+  }
+  weightedPathNetwork(id_){
+    let weighted_net = this.duplicate();
+    let counter0;
+    for (counter0 = 0; counter0 < weighted_net.nodes.length; counter0 ++){
+      weighted_net.nodes[counter0].weight = -1;
+      if (weighted_net.nodes[counter0].id == id_) weighted_net.nodes[counter0].weight = 0;
+    }
+    let get_path = function(initial_node){
+      let counter;
+      let node_neighbors = weighted_net.nodeNeighbors(initial_node);
+      for (counter = 0; counter < node_neighbors.length; counter++){
+        if (weighted_net.getNode(node_neighbors[counter].id).weight == -1 ||
+            weighted_net.getNode(initial_node).weight + weighted_net.getEdgeWeight(initial_node, node_neighbors[counter].id) < weighted_net.getNode(node_neighbors[counter].id).weight){
+          weighted_net.setNodeWeight(node_neighbors[counter].id,
+                                     weighted_net.getEdgeWeight(initial_node, node_neighbors[counter].id) + weighted_net.getNode(initial_node).weight);
+          get_path(node_neighbors[counter].id);
+        }
+      }
+    }
+    get_path(id_);
+    return weighted_net;
+  }
+  breadthFirstSearchUndirected(node1_, node2_){
+    let path = [];
+    let weighted_net = this.weightedPathNetwork(node1_);
+    let end_node = node2_;
+    path.push(end_node);
+    if (weighted_net.getNode(node2_).weight < 0 || weighted_net.getNode(node1_) == null || weighted_net.getNode(node2_) == null)
+      return console.log(`There is no path between ${node1_} and ${node2_}`);
+    while (end_node != node1_){
+      let neighbors = weighted_net.nodeNeighbors(end_node);
+      let counter;
+      let least = weighted_net.getNode(end_node).weight;
+      for (counter = 0; counter < neighbors.length; counter++)
+        if (least > neighbors[counter].weight){
+          least = neighbors[counter].weight;
+          end_node = neighbors[counter].id;
+        }
+      path.push(end_node);
+    }
+    let inverted_path = [];
+    let counter;
+    for (counter = path.length - 1; counter >= 0; counter--) inverted_path.push(path[counter]);
+    return inverted_path;
+  }
+  clusteringCoefficient(id_){
+    let ego_net = this.ego(id_);
+    if (ego_net.nodes.length <= 2) return 0;
+    let max_t = (ego_net.nodes.length - 1)*(ego_net.nodes.length - 2)/2;
+    let actual_t = 0;
+    let counter;
+    for (counter = 0; counter < ego_net.nodes.length; counter ++)
+      if (ego_net.nodes[counter].id != id_){
+        let counter2;
+        for (counter2 = 0; counter2 < ego_net.nodes.length; counter2 ++)
+          if (ego_net.nodes[counter2].id != id_ && ego_net.undirectedEdge(ego_net.nodes[counter2].id, ego_net.nodes[counter].id))
+            actual_t ++;
+      }
+      return actual_t/(2*max_t);
+  }
+  averageClustering(){
+    let counter;
+    let coefficients = 0;
+    for (counter = 0; counter < this.nodes.length; counter++) coefficients += this.clusteringCoefficient(this.nodes[counter].id);
+    return coefficients/this.nodes.length;
   }
 }
 
