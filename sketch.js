@@ -1,9 +1,11 @@
 var controller;
 var NETUSE;
 var TYPE;
+var DEFAULTSIZE;
 
 function setup(){
   controller = new Control();
+  DEFAULTSIZE = 27;
   NETUSE = 0;
   TYPE = 'NONE';
   var canvas = createCanvas(windowWidth/2, 4*windowHeight/5);

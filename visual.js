@@ -1,7 +1,7 @@
 class Visualize{
   constructor(network_){
     this.network = network_;
-    this.size = 20;
+    this.size = DEFAULTSIZE;
   }
   drawNetwork(mouseCommand = [0, 0], type_ = 'NONE'){
     let counter;
@@ -10,7 +10,7 @@ class Visualize{
     for (counter = 0; counter < this.network.edges.length; counter++){
       fill(255);
       // TODO: stroke weight and size of node should be relative to the largest weight edge/node
-      strokeWeight(this.network.edges[counter].weight*2);
+      strokeWeight((this.size/20) + this.network.edges[counter].weight);
       if (this.network.edges[counter].color == -1) stroke(100,100,100);
       else stroke(this.network.edges[counter].color);
       let nodeA = this.network.getNode(this.network.edges[counter].nodes[0]);
@@ -22,17 +22,24 @@ class Visualize{
       line(nodeA.x, nodeA.y, nodeB.x, nodeB.y);
       strokeWeight(2);
       stroke(0);
+      push();
+      translate((nodeA.x + nodeB.x)/2, (nodeA.y + nodeB.y)/2);
+      let rotation;
       if (this.network.edges[counter].direction == 1){
-        push();
-        let rotation;
-        translate((nodeA.x + nodeB.x)/2, (nodeA.y + nodeB.y)/2);
         noStroke();
         fill(200, 100, 100);
         rotation = -atan2(nodeA.x - (nodeA.x + nodeB.x)/2, nodeA.y - (nodeA.y + nodeB.y)/2);
         rotate(rotation);
-        triangle(0, -5, 5, 5, -5, 5);
-        pop();
+        triangle(0, -(5 + this.size)/4, this.size/4, this.size/4, -this.size/4, this.size/4);
       }
+      textAlign(CENTER, CENTER);
+      stroke(0);
+      fill(250);
+      strokeWeight(3);
+      textSize(15);
+      rotate(-rotation);
+      text(this.network.edges[counter].weight, 0, 0);
+      pop();
     }
     for (counter = 0; counter < this.network.nodes.length; counter++){
       let counter2;
@@ -40,7 +47,7 @@ class Visualize{
           this.network.nodes[counter].x = mouseX;
           this.network.nodes[counter].y = mouseY;
       }
-      let temp_size = this.size + this.network.nodes[counter].weight*5;
+      let temp_size = this.size + this.network.nodes[counter].weight*2;
       if (this.network.nodes[counter].color == -1) fill(250,250,250);
       else fill(this.network.nodes[counter].color);
       strokeWeight(1);
@@ -67,6 +74,9 @@ class Visualize{
       push();
       translate(this.network.nodes[counter].x, this.network.nodes[counter].y);
       textAlign(CENTER, CENTER);
+      stroke(0);
+      strokeWeight(3);
+      fill(240);
       let print_text;
       if (type_ == 'weight') print_text = this.network.nodes[counter].weight;
       else if (type_ == 'id') print_text = this.network.nodes[counter].id;

@@ -89,7 +89,6 @@ class Network{
     let knn = 1/this.degree(id_);
     let counter;
     let id_neighbors = this.nodeNeighbors(id_);
-    console.log(">>", id_neighbors);
     for (counter = 0; counter < id_neighbors.length; counter++)
       answer += this.degree(id_neighbors[counter].id);
     return answer*knn;
@@ -283,6 +282,14 @@ Network.prototype.setNodeY = function (id_, y_){
       break;
     }
 }
+Network.prototype.setNodeName = function (id_, name_){
+  let counter;
+  for (counter = 0; counter < this.nodes.length; counter++)
+    if(this.nodes[counter].id == id_){
+      this.nodes[counter].name = name_;
+      break;
+    }
+}
 Network.prototype.setNodeWeight = function (id_, weight_){
   let counter;
   for (counter = 0; counter < this.nodes.length; counter++)
@@ -304,6 +311,12 @@ Network.prototype.setEdgeWeight = function (node1_, node2_, weight_){
     for (counter = 0; counter < this.edges.length; counter++)
       if ((this.edges[counter].nodes[0] == node1_ && this.edges[counter].nodes[1] == node2_) ||
           (this.edges[counter].nodes[0] == node2_ && this.edges[counter].nodes[1] == node1_))
+        this.edges[counter].weight = weight_;
+  }
+  else {
+    let counter;
+    for (counter = 0; counter < this.edges.length; counter++)
+      if ((this.edges[counter].nodes[0] == node1_ && this.edges[counter].nodes[1] == node2_))
         this.edges[counter].weight = weight_;
   }
 }
@@ -406,7 +419,10 @@ class Edge{
 // let randomNet = function (n_, t_){
 //   let temp = new Network();
 //   while (t_ > 0){
-//     temp.addEdge(int(random(n_)), int(random(n_)));
+//     let nodea = int(random(n_));
+//     let nodeb = int(random(n_));
+//     temp.addEdge(nodea, nodeb);
+//     temp.setEdgeWeight(nodea,nodeb,int(random(1,5)))
 //     t_--;
 //   }
 //   return temp;
