@@ -1,8 +1,11 @@
-// Crt + Shift + [ collapses
+// Alt + Crt + Shift + [ collapses
 class Network{
-  constructor(nodes_ = []){
+  constructor(dir_ = 'undirected', nodes_ = []){
     this.nodes = [];
     this.edges = [];
+    if (dir_ == 0) dir_ = 'undirected';
+    else if (dir_ == 1) dir_ = 'directed';
+    this.direction = dir_;
     if (nodes_.length > 0){
       let counter1, counter2;
       for (counter1 = 0; counter1 < nodes_.length; counter1 ++)
@@ -16,37 +19,6 @@ class Network{
               this.addEdge(counter2, counter1, 1, 1);
     }
   }
-  setNodeColor(id_, color_){
-    let counter;
-    for (counter = 0; counter < this.nodes.length; counter++)
-      if(this.nodes[counter].id == id_) this.nodes[counter].color = color_;
-      // will add optimization later (add break)
-  }
-  setNodeX(id_, x_){
-    let counter;
-    for (counter = 0; counter < this.nodes.length; counter++)
-      if(this.nodes[counter].id == id_) this.nodes[counter].x = x_;
-  }
-  setNodeColor(id_, color_){
-    let counter;
-    for (counter = 0; counter < this.nodes.length; counter++)
-      if(this.nodes[counter].id == id_) this.nodes[counter].color = color_;
-  }
-  setNodeY(id_, y_){
-    let counter;
-    for (counter = 0; counter < this.nodes.length; counter++)
-      if(this.nodes[counter].id == id_) this.nodes[counter].y = y_;
-  }
-  setNodeWeight(id_, weight_){
-    let counter;
-    for (counter = 0; counter < this.nodes.length; counter++)
-      if(this.nodes[counter].id == id_) this.nodes[counter].weight = weight_;
-  }
-  addDirectedEdges(edges_){
-    let counter;
-    for(counter = 0; counter < edges_.length; counter++)
-      this.addEdge(edges_[counter][0], edges_[counter][1], 0, 1);
-  }
   getNetworkWeight(){
     let counter;
     let answer = 0;
@@ -54,32 +26,8 @@ class Network{
       answer += this.nodes[counter].weight;
     return answer;
   }
-  getEdgeWeight(node1_, node2_){
-    let counter;
-    for (counter = 0; counter < this.edges.length; counter++)
-      if ((this.edges[counter].nodes[0] == node1_ && this.edges[counter].nodes[1] == node2_) ||
-          (this.edges[counter].nodes[0] == node2_ && this.edges[counter].nodes[1] == node1_))
-        return this.edges[counter].weight;
-    return -1;
-  }
   getGenus(){
     return this.edges.length - this.nodes.length + 1;
-  }
-  undirectedEdge(node1_, node2_){
-    let counter;
-    for (counter = 0; counter < this.edges.length; counter++)
-      if ((this.edges[counter].nodes[0] == node1_ && this.edges[counter].nodes[1] == node2_) ||
-          (this.edges[counter].nodes[0] == node2_ && this.edges[counter].nodes[1] == node1_))
-        return true;
-    return false;
-  }
-  directedEdge(node1_, node2_){
-    let counter;
-    for (counter = 0; counter < this.edges.legth; counter++)
-      if ((this.edges[counter].nodes[0] == node1_ && this.edges[counter].nodes[1] == node2_) &&
-          (this.edges[counter].direction == 1))
-        return true;
-    return false;
   }
   outNeighbors(id_){
     let answer = [];
@@ -133,9 +81,6 @@ class Network{
       if(this.nodes[counter].weight = 0) answer.push(this.nodes[counter]);
     return answer;
   }
-  undirectedMaxEdges(){
-    return this.nodes.length*(this.nodes.length - 1)/2;
-  }
   density(){
     return this.edges.length/this.undirectedMaxEdges();
   }
@@ -174,57 +119,12 @@ class Network{
   }
   duplicate(){
     let counter;
-    let dup = new Network();
+    let dup = new Network(this.direction);
     for (counter = 0; counter < this.nodes.length; counter++)
       dup.addNode(this.nodes[counter].id, this.nodes[counter].name, this.nodes[counter].weight);
     for (counter = 0; counter < this.edges.length; counter++)
       dup.addEdge(this.edges[counter].nodes[0], this.edges[counter].nodes[1], this.edges[counter].weight, this.edges[counter].direction);
     return dup;
-  }
-  weightedPathNetwork(id_){
-    let weighted_net = this.duplicate();
-    let counter0;
-    for (counter0 = 0; counter0 < weighted_net.nodes.length; counter0 ++){
-      weighted_net.nodes[counter0].weight = -1;
-      if (weighted_net.nodes[counter0].id == id_) weighted_net.nodes[counter0].weight = 0;
-    }
-    let get_path = function(initial_node){
-      let counter;
-      let node_neighbors = weighted_net.nodeNeighbors(initial_node);
-      for (counter = 0; counter < node_neighbors.length; counter++){
-        if (weighted_net.getNode(node_neighbors[counter].id).weight == -1 ||
-            weighted_net.getNode(initial_node).weight + weighted_net.getEdgeWeight(initial_node, node_neighbors[counter].id) < weighted_net.getNode(node_neighbors[counter].id).weight){
-          weighted_net.setNodeWeight(node_neighbors[counter].id,
-                                     weighted_net.getEdgeWeight(initial_node, node_neighbors[counter].id) + weighted_net.getNode(initial_node).weight);
-          get_path(node_neighbors[counter].id);
-        }
-      }
-    }
-    get_path(id_);
-    return weighted_net;
-  }
-  breadthFirstSearchUndirected(node1_, node2_){
-    let path = [];
-    let weighted_net = this.weightedPathNetwork(node1_);
-    let end_node = node2_;
-    path.push(end_node);
-    if (weighted_net.getNode(node2_).weight < 0 || weighted_net.getNode(node1_) == null || weighted_net.getNode(node2_) == null)
-      return console.log(`There is no path between ${node1_} and ${node2_}`);
-    while (end_node != node1_){
-      let neighbors = weighted_net.nodeNeighbors(end_node);
-      let counter;
-      let least = weighted_net.getNode(end_node).weight;
-      for (counter = 0; counter < neighbors.length; counter++)
-        if (least > neighbors[counter].weight){
-          least = neighbors[counter].weight;
-          end_node = neighbors[counter].id;
-        }
-      path.push(end_node);
-    }
-    let inverted_path = [];
-    let counter;
-    for (counter = path.length - 1; counter >= 0; counter--) inverted_path.push(path[counter]);
-    return inverted_path;
   }
   clusteringCoefficient(id_){
     let ego_net = this.ego(id_);
@@ -247,6 +147,60 @@ class Network{
     for (counter = 0; counter < this.nodes.length; counter++) coefficients += this.clusteringCoefficient(this.nodes[counter].id);
     return coefficients/this.nodes.length;
   }
+  closenessCentrality(id_){
+    let counter;
+    let sum = 0;
+    for (counter = 0; counter < this.nodes.length; counter++){
+      if (this.breadthFirstSearch(id_, this.nodes[counter].id) < 0)
+        return 0;
+      sum += this.breadthFirstSearch(id_,this.nodes[counter].id).length - 1;
+    }
+    return (this.nodes.length - 1)/sum;
+  }
+}
+
+// Path finding and walk functions
+Network.prototype.weightedPathNetwork = function (id_){
+  let weighted_net = this.duplicate();
+  let counter0;
+  let initial_node = id_;
+  for (counter0 = 0; counter0 < weighted_net.nodes.length; counter0 ++){
+    weighted_net.nodes[counter0].weight = -1;
+    if (weighted_net.nodes[counter0].id == id_) weighted_net.nodes[counter0].weight = 0;
+  }
+  let get_path = function(initial_node){
+    let counter;
+    let node_neighbors = weighted_net.nodeNeighbors(initial_node);
+    for (counter = 0; counter < node_neighbors.length; counter++){
+      if (((weighted_net.getEdgeDirection(initial_node,node_neighbors[counter].id) == 1 && weighted_net.directedEdge(initial_node,node_neighbors[counter].id)) || weighted_net.direction == 'undirected') && (weighted_net.getNode(node_neighbors[counter].id).weight == -1 ||
+          weighted_net.getNode(initial_node).weight + weighted_net.getEdgeWeight(initial_node, node_neighbors[counter].id) < weighted_net.getNode(node_neighbors[counter].id).weight)){
+        weighted_net.setNodeWeight(node_neighbors[counter].id,
+                                   weighted_net.getEdgeWeight(initial_node, node_neighbors[counter].id) + weighted_net.getNode(initial_node).weight);
+        weighted_net.getNode(node_neighbors[counter].id).previous_node = weighted_net.getNode(initial_node).id;
+        get_path(node_neighbors[counter].id);
+      }
+    }
+  }
+  get_path(id_);
+  return weighted_net;
+}
+Network.prototype.breadthFirstSearch = function (node1_, node2_){
+  let path = [];
+  let weighted_net = this.weightedPathNetwork(node1_);
+  let end_node = node2_;
+  path.push(end_node);
+  if (weighted_net.getNode(node2_).weight < 0 || weighted_net.getNode(node1_) == null || weighted_net.getNode(node2_) == null){
+    console.log(`There is no path between ${node1_} and ${node2_}`);
+    return -1;
+  }
+  while (end_node != node1_){
+    end_node = weighted_net.getNode(end_node).previous_node;
+    path.push(end_node);
+  }
+  let inverted_path = [];
+  let counter;
+  for (counter = path.length - 1; counter >= 0; counter--) inverted_path.push(path[counter]);
+  return inverted_path;
 }
 
 // Basic Network functions
@@ -258,16 +212,75 @@ Network.prototype.addNode = function (id_, name_ = '', weight_ = 1){
   }
   this.nodes.push(new Node(id_, name_, weight_));
 }
-Network.prototype.getNode = function (nodeId_){
+Network.prototype.getNode = function (id_){
   let counter;
   for (counter = 0; counter < this.nodes.length; counter++)
-    if (nodeId_ == this.nodes[counter].id) return this.nodes[counter];
+    if (id_ == this.nodes[counter].id) return this.nodes[counter];
   return null;
+}
+Network.prototype.removeNode = function (id_){
+  let counter;
+  for (counter = 0; counter < this.edges.length; counter++){
+    if (this.edges[counter].nodes[0] == id_)
+      this.removeEdge(id_, this.edges[counter].nodes[1]);
+    else if (this.edges[counter].nodes[1] == id_)
+      this.removeEdge(this.edges[counter].nodes[0], id_);
+  }
+  for (counter = 0; counter < this.nodes.length; counter++)
+    if(this.nodes[counter].id == id_)
+      this.nodes.splice(counter,1);
+
+}
+Network.prototype.setNodeColor = function (id_, color_){
+  let counter;
+  for (counter = 0; counter < this.nodes.length; counter++)
+    if(this.nodes[counter].id == id_){
+      this.nodes[counter].color = color_;
+      break;
+    }
+}
+Network.prototype.setNodeX = function (id_, x_){
+  let counter;
+  for (counter = 0; counter < this.nodes.length; counter++)
+    if(this.nodes[counter].id == id_){
+      this.nodes[counter].x = x_;
+      break;
+    }
+}
+Network.prototype.setNodeY = function (id_, y_){
+  let counter;
+  for (counter = 0; counter < this.nodes.length; counter++)
+    if(this.nodes[counter].id == id_){
+      this.nodes[counter].y = y_;
+      break;
+    }
+}
+Network.prototype.setNodeWeight = function (id_, weight_){
+  let counter;
+  for (counter = 0; counter < this.nodes.length; counter++)
+    if(this.nodes[counter].id == id_){
+      this.nodes[counter].weight = weight_;
+      break;
+    }
 }
 
 // Edge Functions
-Network.prototype.addEdge = function (node1_, node2_, weight_ = 1, direction_ = 0){
-  if (!this.undirectedEdge(node1_, node2_) && node1_ != node2_){
+Network.prototype.addEdge = function (node1_ = 'ERR', node2_ = 'ERR', weight_ = 1){
+  if (node1_ == 'ERR' || node2_ == 'ERR' || node1_ == node2_) return 'Insufficient info';
+  if (this.direction == 'undirected') this.addEdgeType(node1_, node2_, weight_,0);
+  else this.addEdgeType(node1_, node2_, weight_, 1);
+}
+Network.prototype.setEdgeWeight = function (node1_, node2_, weight_){
+  if (this.direction == 'undirected'){
+    let counter;
+    for (counter = 0; counter < this.edges.length; counter++)
+      if ((this.edges[counter].nodes[0] == node1_ && this.edges[counter].nodes[1] == node2_) ||
+          (this.edges[counter].nodes[0] == node2_ && this.edges[counter].nodes[1] == node1_))
+        this.edges[counter].weight = weight_;
+  }
+}
+Network.prototype.addEdgeType = function (node1_, node2_, weight_ = 1, direction_ = 0){
+  if (direction_ == 0 && !this.undirectedEdge(node1_, node2_) && node1_ != node2_){
     this.edges.push(new Edge(node1_, node2_, weight_, direction_));
     // if the nodes don't exist, they are added without names or weights
     if (this.getNode(node1_) == null)
@@ -275,19 +288,72 @@ Network.prototype.addEdge = function (node1_, node2_, weight_ = 1, direction_ = 
     if (this.getNode(node2_) == null)
       this.addNode(node2_);
   }
-  else console.log("Edge already exists");
+  else if (direction_ == 1 && !this.directedEdge(node1_, node2_)){
+    this.edges.push(new Edge(node1_, node2_, weight_, direction_));
+    // if the nodes don't exist, they are added without names or weights
+    if (this.getNode(node1_) == null)
+      this.addNode(node1_);
+    if (this.getNode(node2_) == null)
+      this.addNode(node2_);
+  }
+  // else console.log("Edge already exists");
 }
-Network.prototype.addEdges = function (edges_){
+Network.prototype.addEdgesType = function (edges_){
   let counter;
   for(counter = 0; counter < edges_.length; counter++)
-    this.addEdge(edges_[counter][0], edges_[counter][1], 0, 1);
+    this.addEdge(edges_[counter][0], edges_[counter][1]);
 }
-
+Network.prototype.directedEdge = function (node1_, node2_){
+  let counter;
+  for (counter = 0; counter < this.edges.length; counter++){
+    if (int(this.edges[counter].nodes[0]) == int(node1_) && int(this.edges[counter].nodes[1]) == int(node2_))
+      return true;
+    }
+  return false;
+}
+Network.prototype.getEdgeWeight = function (node1_, node2_){
+  let counter;
+  for (counter = 0; counter < this.edges.length; counter++)
+    if ((this.edges[counter].nodes[0] == node1_ && this.edges[counter].nodes[1] == node2_) ||
+        (this.edges[counter].nodes[0] == node2_ && this.edges[counter].nodes[1] == node1_))
+      return this.edges[counter].weight;
+  return -1;
+}
+Network.prototype.getEdgeDirection = function (node1_, node2_){
+  let counter;
+  for (counter = 0; counter < this.edges.length; counter++)
+    if ((this.edges[counter].nodes[0] == node1_ && this.edges[counter].nodes[1] == node2_) ||
+        (this.edges[counter].nodes[0] == node2_ && this.edges[counter].nodes[1] == node1_))
+      return this.edges[counter].direction;
+  return -1;
+}
+Network.prototype.undirectedEdge = function (node1_, node2_){
+  let counter;
+  for (counter = 0; counter < this.edges.length; counter++)
+    if ((this.edges[counter].nodes[0] == node1_ && this.edges[counter].nodes[1] == node2_) ||
+        (this.edges[counter].nodes[0] == node2_ && this.edges[counter].nodes[1] == node1_))
+      return true;
+  return false;
+}
+Network.prototype.undirectedMaxEdges = function (){
+  return this.nodes.length*(this.nodes.length - 1)/2;
+}
+Network.prototype.removeEdge = function (node1_, node2_){
+  let counter;
+  // Note that all edges connecting the two nodes will be deleted, if you want to only remove one do it yorself
+  for (counter = 0; counter < this.edges.length; counter++){
+    if ((this.edges[counter].direction == 0) && ((this.edges[counter].nodes[1] == node1_ && this.edges[counter].nodes[0] == node2_)||(this.edges[counter].nodes[0] == node1_ && this.edges[counter].nodes[1] == node2_)))
+      this.edges.splice(counter,1);
+    else if (this.edges[counter].direction == 1 && this.edges[counter].nodes[0] == node1_ && this.edges[counter].nodes[1] == node2_)
+      this.edges.splice(counter,1);
+  }
+  // Why even bother doing this if it only solves the problem for edges a>b, a<b; not a>>b
+}
 
 // Node and Edges classes
 class Node{
   // x and y positions kept to facilitate visualizations
-  constructor(id_, name_ = '', weight_ = 1, x_ = 0, y_ = 0, color_ = []){
+  constructor(id_, name_ = '', weight_ = 1, x_ = 0, y_ = 0, color_ = -1){
     this.id = id_;
     this.weight = weight_;
     this.name = name_;
@@ -299,9 +365,10 @@ class Node{
 class Edge{
   // takes 2 nodes' ids, a value, and a direction (0 = undirected,
   // 1 = directed towards node 2)
-  constructor(node1_, node2_, weight_ = 1, direction_ = 0){
+  constructor(node1_, node2_, weight_ = 1, direction_ = 0, color_ = -1){
     this.nodes = [node1_, node2_];
     this.direction = direction_;
     this.weight = weight_;
+    this.color = color_;
   }
 }

@@ -9,8 +9,10 @@ class Visualize{
       return;
     for (counter = 0; counter < this.network.edges.length; counter++){
       fill(255);
-      strokeWeight(5);
-      stroke(220, 50);
+      // TODO: stroke weight and size of node should be relative to the largest weight edge/node
+      strokeWeight(this.network.edges[counter].weight*2);
+      if (this.network.edges[counter].color == -1) stroke(100,100,100);
+      else stroke(this.network.edges[counter].color);
       let nodeA = this.network.getNode(this.network.edges[counter].nodes[0]);
       let nodeB = this.network.getNode(this.network.edges[counter].nodes[1]);
       if (nodeA.x < 1) this.network.setNodeX(nodeA.id, random(50, width-50));
@@ -20,17 +22,27 @@ class Visualize{
       line(nodeA.x, nodeA.y, nodeB.x, nodeB.y);
       strokeWeight(2);
       stroke(0);
+      if (this.network.edges[counter].direction == 1){
+        push();
+        let rotation;
+        translate((nodeA.x + nodeB.x)/2, (nodeA.y + nodeB.y)/2);
+        noStroke();
+        fill(200, 100, 100);
+        rotation = -atan2(nodeA.x - (nodeA.x + nodeB.x)/2, nodeA.y - (nodeA.y + nodeB.y)/2);
+        rotate(rotation);
+        triangle(0, -5, 5, 5, -5, 5);
+        pop();
+      }
     }
     for (counter = 0; counter < this.network.nodes.length; counter++){
-      fill(this.network.nodes[counter].color[0], this.network.nodes[counter].color[1], this.network.nodes[counter].color[2]);
-      this.network.nodes[counter].color = [0, 198, 207];
       let counter2;
       if (this.network.nodes[counter].name.indexOf('move') > -1){
           this.network.nodes[counter].x = mouseX;
           this.network.nodes[counter].y = mouseY;
       }
       let temp_size = this.size + this.network.nodes[counter].weight*5;
-      fill(255);
+      if (this.network.nodes[counter].color == -1) fill(250,250,250);
+      else fill(this.network.nodes[counter].color);
       strokeWeight(1);
       stroke(1);
       if (this.network.nodes[counter].weight < 0) temp_size = this.size + this.network.nodes[counter].weight/2;
@@ -47,7 +59,6 @@ class Visualize{
         circle(this.network.nodes[counter].x, this.network.nodes[counter].y, (temp_size));
       }
       else{
-        fill(255);
         circle(this.network.nodes[counter].x, this.network.nodes[counter].y, (temp_size));
       }
       fill(0);
