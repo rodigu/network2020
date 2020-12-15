@@ -159,6 +159,34 @@ class Network{
   }
 }
 
+// Other Functions
+Network.prototype.core = function (k_){
+  let ans = this.duplicate();
+  let k_counter = 1;
+  let decomp = function(graph0_, ksub_){
+    let counter;
+    let graph_ = graph0_.duplicate();
+    while (true){
+      if (graph_.nodes.length < 1) return graph_;
+      let j;
+      for (j = 0; j < graph_.nodes.length; j++){
+        if (graph_.degree(graph_.nodes[j].id) <= ksub_) break;
+      }
+      if (j == graph_.nodes.length) break;
+      for (counter = 0; counter < graph_.nodes.length; counter ++){
+        if (graph_.degree(graph_.nodes[counter].id) <= ksub_) graph_.removeNode(graph_.nodes[counter].id);
+      }
+    }
+    return graph_;
+  }
+  let counter1;
+  for (counter1 = 1; counter1 <= k_; counter1++){
+    if (ans.nodes.length < 1) return ans;
+    ans = decomp(ans, counter1);
+  }
+  return ans;
+}
+
 // Path finding and walk functions
 Network.prototype.weightedPathNetwork = function (id_){
   let weighted_net = this.duplicate();
@@ -372,3 +400,14 @@ class Edge{
     this.color = color_;
   }
 }
+
+
+// Random Network Generator for tests
+// let randomNet = function (n_, t_){
+//   let temp = new Network();
+//   while (t_ > 0){
+//     temp.addEdge(int(random(n_)), int(random(n_)));
+//     t_--;
+//   }
+//   return temp;
+// }
