@@ -22,7 +22,9 @@ function draw(network_ = 0, type_ = 'NONE'){
   controller.mouseController();
   if (NETUSE === 0);
   else {
-    background(0);
+    background(240);
+    fill(0);
+    rect(2, 2, width - 4, height - 4);
     let visual = new Visualize(NETUSE);
     visual.drawNetwork(controller.mouse, TYPE);
   }
